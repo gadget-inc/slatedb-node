@@ -28,8 +28,13 @@
       "import": "./lib/index.js"
     }
   },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "scripts": {
     "artifacts": "napi artifacts",
+    "create-npm-dirs": "napi create-npm-dirs",
     "build": "pnpm run clean && pnpm run build:debug && pnpm run build:ts",
     "build:debug": "napi build --platform --no-js --dts target/napi-rs/index.d.ts",
     "build:release": "napi build --platform --release --no-js --dts target/napi-rs/index.d.ts",
@@ -40,7 +45,7 @@
     "lint:fix": "oxfmt && oxlint --type-aware --fix",
     "lint:oxfmt": "oxfmt --check",
     "lint:oxlint": "oxlint --type-aware --deny-warnings",
-    "prepublishOnly": "napi prepublish -t npm --no-js --dts target/napi-rs/index.d.ts",
+    "prepublishOnly": "napi pre-publish -t npm",
     "release": "pnpm run build:release && pnpm run build:ts",
     "test": "pnpm run build:debug && pnpm run build:ts && vitest run"
   },

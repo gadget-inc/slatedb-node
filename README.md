@@ -102,10 +102,27 @@ pnpm test
 
 ## Prebuilt Binaries
 
-The package is configured for `@napi-rs/cli` prebuilt targets:
+The package uses `@napi-rs/cli` optional dependency packages (like `esbuild`/`swc`) so the main package stays small and installs only the binary for the current platform.
+
+Generated optional packages:
 
 - macOS x64 / arm64
 - Linux x64 / arm64 (gnu + musl)
 - Windows x64 / arm64 (msvc)
 
-CI can build and publish artifacts with `napi prepublish -t npm`.
+The generated package names are:
+
+- `slatedb-node-darwin-x64`
+- `slatedb-node-darwin-arm64`
+- `slatedb-node-linux-x64-gnu`
+- `slatedb-node-linux-x64-musl`
+- `slatedb-node-linux-arm64-gnu`
+- `slatedb-node-linux-arm64-musl`
+- `slatedb-node-win32-x64-msvc`
+- `slatedb-node-win32-arm64-msvc`
+
+## Publishing
+
+`publish.yml` builds all native targets, downloads artifacts, creates per-platform npm package dirs, and runs `npm publish`.
+
+`prepublishOnly` runs `napi pre-publish -t npm`, which updates `optionalDependencies` and publishes the platform packages alongside the main package.
