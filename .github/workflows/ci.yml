@@ -54,20 +54,28 @@ jobs:
         include:
           - os: macos-latest
             target: x86_64-apple-darwin
+            cross_compile: false
           - os: macos-latest
             target: aarch64-apple-darwin
+            cross_compile: false
           - os: windows-latest
             target: x86_64-pc-windows-msvc
+            cross_compile: false
           - os: windows-latest
             target: aarch64-pc-windows-msvc
+            cross_compile: false
           - os: ubuntu-latest
             target: x86_64-unknown-linux-gnu
+            cross_compile: false
           - os: ubuntu-latest
             target: x86_64-unknown-linux-musl
+            cross_compile: true
           - os: ubuntu-latest
             target: aarch64-unknown-linux-gnu
+            cross_compile: true
           - os: ubuntu-latest
             target: aarch64-unknown-linux-musl
+            cross_compile: true
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v6
@@ -87,8 +95,17 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      - name: Install Zig
+        if: matrix.cross_compile
+        uses: goto-bus-stop/setup-zig@v2
+
       - name: Build native target
+        if: ${{ !matrix.cross_compile }}
         run: pnpm exec napi build --platform --release --target ${{ matrix.target }}
+
+      - name: Build native target (cross)
+        if: matrix.cross_compile
+        run: pnpm exec napi build --platform --release --cross-compile --target ${{ matrix.target }}
 
       - name: Upload native artifact
         uses: actions/upload-artifact@v4
