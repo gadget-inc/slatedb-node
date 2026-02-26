@@ -62,3 +62,12 @@ unthunk
 usagestop
 vitest
 worktrees
+cdylib
+chrono
+dtolnay
+memtable
+msvc
+napi
+seqnum
+serde
+slatedb

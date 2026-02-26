@@ -1,7 +1,7 @@
 {
   "name": "slatedb-node",
   "version": "0.1.0",
-  "description": "node bindings for slatedb",
+  "description": "Node.js bindings for SlateDB via napi-rs",
   "homepage": "https://github.com/gadget-inc/slatedb-node",
   "bugs": {
     "url": "https://github.com/gadget-inc/slatedb-node/issues"
@@ -15,37 +15,59 @@
     "url": "git+https://github.com/gadget-inc/slatedb-node.git"
   },
   "files": [
-    "/assets",
-    "/bin",
-    "/dist",
-    "/npm-shrinkwrap.json",
-    "/package.json",
-    "/README.md"
+    "lib",
+    "native.cjs",
+    "README.md"
   ],
   "type": "module",
+  "main": "./lib/index.js",
+  "types": "./lib/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./lib/index.d.ts",
+      "import": "./lib/index.js"
+    }
+  },
   "scripts": {
-    "build": "pnpm run clean && esbuild src/main.ts --outdir=dist --format=esm --platform=node --target=node20 --inject:./shims/cjs.js --bundle --splitting --minify --keep-names --sourcemap",
-    "build:watch": "pnpm run build --minify=false --sources-content=false --watch",
-    "clean": "rimraf dist tmp/spec",
-    "dev": "run-p -s 'test:watch --no-clear-screen' 'build:watch'",
+    "artifacts": "napi artifacts",
+    "build": "pnpm run clean && pnpm run build:debug && pnpm run build:ts",
+    "build:debug": "napi build --platform --no-js --dts target/napi-rs/index.d.ts",
+    "build:release": "napi build --platform --release --no-js --dts target/napi-rs/index.d.ts",
+    "build:ts": "tsc -p tsconfig.build.json",
+    "clean": "rimraf *.node",
     "lint": "pnpm run --aggregate-output '/^lint:(?!fix).*/'",
     "lint:cspell": "cspell . --no-progress --show-suggestions --show-context",
     "lint:fix": "oxfmt && oxlint --type-aware --fix",
     "lint:oxfmt": "oxfmt --check",
     "lint:oxlint": "oxlint --type-aware --deny-warnings",
-    "release": "pnpm run build",
-    "test": "vitest",
-    "test:watch": "pnpm run test --standalone --watch"
+    "prepublishOnly": "napi prepublish -t npm --no-js --dts target/napi-rs/index.d.ts",
+    "release": "pnpm run build:release && pnpm run build:ts",
+    "test": "pnpm run build:debug && pnpm run build:ts && vitest run"
   },
   "devDependencies": {
+    "@napi-rs/cli": "^3.2.0",
+    "@types/node": "^24.5.2",
     "cspell": "^9.6.4",
     "oxfmt": "^0.32.0",
     "oxlint": "^1.49.0",
     "oxlint-tsgolint": "^0.14.1",
+    "rimraf": "^6.0.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3",
-    "vitest": "^4.0.15",
-    "watcher": "^2.3.1"
+    "vitest": "^4.0.15"
+  },
+  "napi": {
+    "binaryName": "slatedb-node",
+    "targets": [
+      "x86_64-apple-darwin",
+      "aarch64-apple-darwin",
+      "x86_64-pc-windows-msvc",
+      "aarch64-pc-windows-msvc",
+      "x86_64-unknown-linux-gnu",
+      "x86_64-unknown-linux-musl",
+      "aarch64-unknown-linux-gnu",
+      "aarch64-unknown-linux-musl"
+    ]
   },
   "engines": {
     "node": ">=20.0.0"

@@ -12,3 +12,7 @@ node_modules
 tmp
 .envrc.local
 *.orig
+target
+*.node
+index.js
+index.d.ts

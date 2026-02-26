@@ -1,0 +1,15 @@
+{
+  "extends": "./tsconfig.json",
+  "include": ["src/index.ts"],
+  "compilerOptions": {
+    "allowJs": false,
+    "checkJs": false,
+    "declaration": true,
+    "declarationMap": false,
+    "emitDeclarationOnly": false,
+    "noEmit": false,
+    "outDir": "lib",
+    "rootDir": "src",
+    "sourceMap": false
+  }
+}
