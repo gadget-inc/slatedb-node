@@ -72,5 +72,11 @@
   "engines": {
     "node": ">=20.0.0"
   },
-  "packageManager": "pnpm@10.11.0"
+  "packageManager": "pnpm@10.11.0",
+  "pnpm": {
+    "overrides": {
+      "diff": "^4.0.4",
+      "rollup": "^4.59.0"
+    }
+  }
 }
