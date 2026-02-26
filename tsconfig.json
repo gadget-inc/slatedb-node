@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "include": ["bin/dev.js", "scripts", "shims", "spec", "src", "*.js", "*.cjs", ".*.cjs"],
+  "exclude": ["node_modules", "spec/__fixtures__"],
+  "ts-node": {
+    "transpileOnly": true
+  },
+  "compilerOptions": {
+    /* Type Checking */
+    "strict": true,
+
+    /* Modules */
+    "module": "Node16",
+    "moduleResolution": "node16",
+    "resolveJsonModule": true,
+    "types": ["node"],
+
+    /* Emit */
+    "noEmit": true,
+
+    /* JavaScript Support */
+    "allowJs": true,
+    "checkJs": true,
+
+    /* Interop Constraints */
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "verbatimModuleSyntax": true,
+
+    /* Language and Environment */
+    "lib": ["es2021"],
+    "target": "es2021",
+    "useDefineForClassFields": true,
+
+    /* Completeness */
+    "skipLibCheck": true,
+    "sourceMap": true
+  }
+}
