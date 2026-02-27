@@ -115,6 +115,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      - name: Build TypeScript API
+        run: pnpm run build:ts
+
       - name: Download all artifacts
         uses: actions/download-artifact@v4
         with:
