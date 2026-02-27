@@ -53,6 +53,10 @@ sorhus
 sourcemaps
 swtinem
 swatinem
+sccache
+sccaches
+rustc
+rustcs
 sprintln
 sprintlns
 stefanzweifel

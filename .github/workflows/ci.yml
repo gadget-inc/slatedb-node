@@ -48,6 +48,9 @@ jobs:
         run: pnpm run test
 
   build-native:
+    env:
+      RUSTC_WRAPPER: sccache
+      SCCACHE_GHA_ENABLED: "true"
     strategy:
       fail-fast: false
       matrix:
@@ -92,6 +95,9 @@ jobs:
         with:
           targets: ${{ matrix.target }}
 
+      - name: Install sccache
+        uses: mozilla-actions/sccache-action@v0.0.7
+
       - name: Cache Rust build
         uses: Swatinem/rust-cache@v2
         with:
@@ -118,3 +124,7 @@ jobs:
           name: native-${{ matrix.target }}
           path: slatedb-node.*.node
           if-no-files-found: error
+
+      - name: Show sccache stats
+        if: always()
+        run: sccache --show-stats
