@@ -48,6 +48,9 @@ jobs:
         run: pnpm run test
 
   build-native:
+    env:
+      RUSTC_WRAPPER: sccache
+      SCCACHE_GHA_ENABLED: "true"
     strategy:
       fail-fast: false
       matrix:
@@ -93,29 +96,7 @@ jobs:
           targets: ${{ matrix.target }}
 
       - name: Install sccache
-        uses: mozilla-actions/sccache-action@v0.0.7
-
-      - name: Configure sccache
-        id: sccache
-        shell: bash
-        run: |
-          set -euo pipefail
-          echo "SCCACHE_GHA_ENABLED=true" >> "$GITHUB_ENV"
-          if sccache --start-server >/dev/null 2>&1; then
-            echo "RUSTC_WRAPPER=sccache" >> "$GITHUB_ENV"
-            echo "enabled=true" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-
-          echo "SCCACHE_GHA_ENABLED=false" >> "$GITHUB_ENV"
-          sccache --stop-server >/dev/null 2>&1 || true
-          if sccache --start-server >/dev/null 2>&1; then
-            echo "RUSTC_WRAPPER=sccache" >> "$GITHUB_ENV"
-            echo "enabled=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "enabled=false" >> "$GITHUB_OUTPUT"
-            echo "sccache unavailable; continuing without RUSTC_WRAPPER"
-          fi
+        uses: mozilla-actions/sccache-action@v0.0.9
 
       - name: Cache Rust build
         uses: Swatinem/rust-cache@v2
@@ -145,5 +126,5 @@ jobs:
           if-no-files-found: error
 
       - name: Show sccache stats
-        if: always() && steps.sccache.outputs.enabled == 'true'
+        if: always()
         run: sccache --show-stats
