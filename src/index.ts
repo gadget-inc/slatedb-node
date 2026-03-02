@@ -451,24 +451,24 @@ export class WriteBatch {
     this.native = new native.NativeWriteBatch();
   }
 
-  put(key: Binary, value: Binary): void {
-    this.native.put(toBuffer(key), toBuffer(value));
-  }
-
-  putWithOptions(key: Binary, value: Binary, options?: PutOptions): void {
-    this.native.putWithOptions(toBuffer(key), toBuffer(value), options);
+  put(key: Binary, value: Binary, options?: PutOptions): void {
+    if (options) {
+      this.native.putWithOptions(toBuffer(key), toBuffer(value), options);
+    } else {
+      this.native.put(toBuffer(key), toBuffer(value));
+    }
   }
 
   delete(key: Binary): void {
     this.native.delete(toBuffer(key));
   }
 
-  merge(key: Binary, value: Binary): void {
-    this.native.merge(toBuffer(key), toBuffer(value));
-  }
-
-  mergeWithOptions(key: Binary, value: Binary, options?: MergeOptions): void {
-    this.native.mergeWithOptions(toBuffer(key), toBuffer(value), options);
+  merge(key: Binary, value: Binary, options?: MergeOptions): void {
+    if (options) {
+      this.native.mergeWithOptions(toBuffer(key), toBuffer(value), options);
+    } else {
+      this.native.merge(toBuffer(key), toBuffer(value));
+    }
   }
 
   getNative(): NativeWriteBatch {
@@ -483,31 +483,28 @@ export class SlateDBSnapshot {
     this.native = nativeSnapshot;
   }
 
-  async get(key: Binary): Promise<Buffer | null> {
+  async get(key: Binary, options?: ReadOptions): Promise<Buffer | null> {
+    if (options) {
+      return call(() => this.native.getWithOptions(toBuffer(key), options));
+    }
     return call(() => this.native.get(toBuffer(key)));
   }
 
-  async getWithOptions(key: Binary, options?: ReadOptions): Promise<Buffer | null> {
-    return call(() => this.native.getWithOptions(toBuffer(key), options));
-  }
-
-  async scan(start: Binary, end?: Binary): Promise<SlateDBIterator> {
+  async scan(start: Binary, end?: Binary, options?: ScanOptions): Promise<SlateDBIterator> {
+    if (options) {
+      const iterator = await call(() => this.native.scanWithOptions(toBuffer(start), end == null ? undefined : toBuffer(end), options));
+      return new SlateDBIterator(iterator);
+    }
     const iterator = await call(() => this.native.scan(toBuffer(start), end == null ? undefined : toBuffer(end)));
     return new SlateDBIterator(iterator);
   }
 
-  async scanWithOptions(start: Binary, end?: Binary, options?: ScanOptions): Promise<SlateDBIterator> {
-    const iterator = await call(() => this.native.scanWithOptions(toBuffer(start), end == null ? undefined : toBuffer(end), options));
-    return new SlateDBIterator(iterator);
-  }
-
-  async scanPrefix(prefix: Binary): Promise<SlateDBIterator> {
+  async scanPrefix(prefix: Binary, options?: ScanOptions): Promise<SlateDBIterator> {
+    if (options) {
+      const iterator = await call(() => this.native.scanPrefixWithOptions(toBuffer(prefix), options));
+      return new SlateDBIterator(iterator);
+    }
     const iterator = await call(() => this.native.scanPrefix(toBuffer(prefix)));
-    return new SlateDBIterator(iterator);
-  }
-
-  async scanPrefixWithOptions(prefix: Binary, options?: ScanOptions): Promise<SlateDBIterator> {
-    const iterator = await call(() => this.native.scanPrefixWithOptions(toBuffer(prefix), options));
     return new SlateDBIterator(iterator);
   }
 
@@ -523,52 +520,49 @@ export class SlateDBTransaction {
     this.native = nativeTransaction;
   }
 
-  async get(key: Binary): Promise<Buffer | null> {
+  async get(key: Binary, options?: ReadOptions): Promise<Buffer | null> {
+    if (options) {
+      return call(() => this.native.getWithOptions(toBuffer(key), options));
+    }
     return call(() => this.native.get(toBuffer(key)));
   }
 
-  async getWithOptions(key: Binary, options?: ReadOptions): Promise<Buffer | null> {
-    return call(() => this.native.getWithOptions(toBuffer(key), options));
-  }
-
-  async scan(start: Binary, end?: Binary): Promise<SlateDBIterator> {
+  async scan(start: Binary, end?: Binary, options?: ScanOptions): Promise<SlateDBIterator> {
+    if (options) {
+      const iterator = await call(() => this.native.scanWithOptions(toBuffer(start), end == null ? undefined : toBuffer(end), options));
+      return new SlateDBIterator(iterator);
+    }
     const iterator = await call(() => this.native.scan(toBuffer(start), end == null ? undefined : toBuffer(end)));
     return new SlateDBIterator(iterator);
   }
 
-  async scanWithOptions(start: Binary, end?: Binary, options?: ScanOptions): Promise<SlateDBIterator> {
-    const iterator = await call(() => this.native.scanWithOptions(toBuffer(start), end == null ? undefined : toBuffer(end), options));
-    return new SlateDBIterator(iterator);
-  }
-
-  async scanPrefix(prefix: Binary): Promise<SlateDBIterator> {
+  async scanPrefix(prefix: Binary, options?: ScanOptions): Promise<SlateDBIterator> {
+    if (options) {
+      const iterator = await call(() => this.native.scanPrefixWithOptions(toBuffer(prefix), options));
+      return new SlateDBIterator(iterator);
+    }
     const iterator = await call(() => this.native.scanPrefix(toBuffer(prefix)));
     return new SlateDBIterator(iterator);
   }
 
-  async scanPrefixWithOptions(prefix: Binary, options?: ScanOptions): Promise<SlateDBIterator> {
-    const iterator = await call(() => this.native.scanPrefixWithOptions(toBuffer(prefix), options));
-    return new SlateDBIterator(iterator);
-  }
-
-  async put(key: Binary, value: Binary): Promise<void> {
-    await call(() => this.native.put(toBuffer(key), toBuffer(value)));
-  }
-
-  async putWithOptions(key: Binary, value: Binary, options?: PutOptions): Promise<void> {
-    await call(() => this.native.putWithOptions(toBuffer(key), toBuffer(value), options));
+  async put(key: Binary, value: Binary, options?: PutOptions): Promise<void> {
+    if (options) {
+      await call(() => this.native.putWithOptions(toBuffer(key), toBuffer(value), options));
+    } else {
+      await call(() => this.native.put(toBuffer(key), toBuffer(value)));
+    }
   }
 
   async delete(key: Binary): Promise<void> {
     await call(() => this.native.delete(toBuffer(key)));
   }
 
-  async merge(key: Binary, value: Binary): Promise<void> {
-    await call(() => this.native.merge(toBuffer(key), toBuffer(value)));
-  }
-
-  async mergeWithOptions(key: Binary, value: Binary, options?: MergeOptions): Promise<void> {
-    await call(() => this.native.mergeWithOptions(toBuffer(key), toBuffer(value), options));
+  async merge(key: Binary, value: Binary, options?: MergeOptions): Promise<void> {
+    if (options) {
+      await call(() => this.native.mergeWithOptions(toBuffer(key), toBuffer(value), options));
+    } else {
+      await call(() => this.native.merge(toBuffer(key), toBuffer(value)));
+    }
   }
 
   async markRead(keys: Binary[]): Promise<void> {
@@ -600,31 +594,28 @@ export class SlateDBReader {
     this.native = nativeReader;
   }
 
-  async get(key: Binary): Promise<Buffer | null> {
+  async get(key: Binary, options?: ReadOptions): Promise<Buffer | null> {
+    if (options) {
+      return call(() => this.native.getWithOptions(toBuffer(key), options));
+    }
     return call(() => this.native.get(toBuffer(key)));
   }
 
-  async getWithOptions(key: Binary, options?: ReadOptions): Promise<Buffer | null> {
-    return call(() => this.native.getWithOptions(toBuffer(key), options));
-  }
-
-  async scan(start: Binary, end?: Binary): Promise<SlateDBIterator> {
+  async scan(start: Binary, end?: Binary, options?: ScanOptions): Promise<SlateDBIterator> {
+    if (options) {
+      const iterator = await call(() => this.native.scanWithOptions(toBuffer(start), end == null ? undefined : toBuffer(end), options));
+      return new SlateDBIterator(iterator);
+    }
     const iterator = await call(() => this.native.scan(toBuffer(start), end == null ? undefined : toBuffer(end)));
     return new SlateDBIterator(iterator);
   }
 
-  async scanWithOptions(start: Binary, end?: Binary, options?: ScanOptions): Promise<SlateDBIterator> {
-    const iterator = await call(() => this.native.scanWithOptions(toBuffer(start), end == null ? undefined : toBuffer(end), options));
-    return new SlateDBIterator(iterator);
-  }
-
-  async scanPrefix(prefix: Binary): Promise<SlateDBIterator> {
+  async scanPrefix(prefix: Binary, options?: ScanOptions): Promise<SlateDBIterator> {
+    if (options) {
+      const iterator = await call(() => this.native.scanPrefixWithOptions(toBuffer(prefix), options));
+      return new SlateDBIterator(iterator);
+    }
     const iterator = await call(() => this.native.scanPrefix(toBuffer(prefix)));
-    return new SlateDBIterator(iterator);
-  }
-
-  async scanPrefixWithOptions(prefix: Binary, options?: ScanOptions): Promise<SlateDBIterator> {
-    const iterator = await call(() => this.native.scanPrefixWithOptions(toBuffer(prefix), options));
     return new SlateDBIterator(iterator);
   }
 
@@ -714,71 +705,64 @@ export class SlateDB {
     return open(options);
   }
 
-  async get(key: Binary): Promise<Buffer | null> {
+  async get(key: Binary, options?: ReadOptions): Promise<Buffer | null> {
+    if (options) {
+      return call(() => this.native.getWithOptions(toBuffer(key), options));
+    }
     return call(() => this.native.get(toBuffer(key)));
   }
 
-  async getWithOptions(key: Binary, options?: ReadOptions): Promise<Buffer | null> {
-    return call(() => this.native.getWithOptions(toBuffer(key), options));
-  }
-
-  async put(key: Binary, value: Binary): Promise<WriteHandle> {
+  async put(key: Binary, value: Binary, putOptions?: PutOptions, writeOptions?: WriteOptions): Promise<WriteHandle> {
+    if (putOptions || writeOptions) {
+      const handle = await call(() => this.native.putWithOptions(toBuffer(key), toBuffer(value), putOptions, writeOptions));
+      return mapWriteHandle(handle);
+    }
     const handle = await call(() => this.native.put(toBuffer(key), toBuffer(value)));
     return mapWriteHandle(handle);
   }
 
-  async putWithOptions(key: Binary, value: Binary, putOptions?: PutOptions, writeOptions?: WriteOptions): Promise<WriteHandle> {
-    const handle = await call(() => this.native.putWithOptions(toBuffer(key), toBuffer(value), putOptions, writeOptions));
-    return mapWriteHandle(handle);
-  }
-
-  async delete(key: Binary): Promise<WriteHandle> {
+  async delete(key: Binary, writeOptions?: WriteOptions): Promise<WriteHandle> {
+    if (writeOptions) {
+      const handle = await call(() => this.native.deleteWithOptions(toBuffer(key), writeOptions));
+      return mapWriteHandle(handle);
+    }
     const handle = await call(() => this.native.delete(toBuffer(key)));
     return mapWriteHandle(handle);
   }
 
-  async deleteWithOptions(key: Binary, writeOptions?: WriteOptions): Promise<WriteHandle> {
-    const handle = await call(() => this.native.deleteWithOptions(toBuffer(key), writeOptions));
-    return mapWriteHandle(handle);
-  }
-
-  async merge(key: Binary, value: Binary): Promise<WriteHandle> {
+  async merge(key: Binary, value: Binary, mergeOptions?: MergeOptions, writeOptions?: WriteOptions): Promise<WriteHandle> {
+    if (mergeOptions || writeOptions) {
+      const handle = await call(() => this.native.mergeWithOptions(toBuffer(key), toBuffer(value), mergeOptions, writeOptions));
+      return mapWriteHandle(handle);
+    }
     const handle = await call(() => this.native.merge(toBuffer(key), toBuffer(value)));
     return mapWriteHandle(handle);
   }
 
-  async mergeWithOptions(key: Binary, value: Binary, mergeOptions?: MergeOptions, writeOptions?: WriteOptions): Promise<WriteHandle> {
-    const handle = await call(() => this.native.mergeWithOptions(toBuffer(key), toBuffer(value), mergeOptions, writeOptions));
-    return mapWriteHandle(handle);
-  }
-
-  async write(batch: WriteBatch): Promise<WriteHandle> {
+  async write(batch: WriteBatch, writeOptions?: WriteOptions): Promise<WriteHandle> {
+    if (writeOptions) {
+      const handle = await call(() => this.native.writeWithOptions(batch.getNative(), writeOptions));
+      return mapWriteHandle(handle);
+    }
     const handle = await call(() => this.native.write(batch.getNative()));
     return mapWriteHandle(handle);
   }
 
-  async writeWithOptions(batch: WriteBatch, writeOptions?: WriteOptions): Promise<WriteHandle> {
-    const handle = await call(() => this.native.writeWithOptions(batch.getNative(), writeOptions));
-    return mapWriteHandle(handle);
-  }
-
-  async scan(start: Binary, end?: Binary): Promise<SlateDBIterator> {
+  async scan(start: Binary, end?: Binary, options?: ScanOptions): Promise<SlateDBIterator> {
+    if (options) {
+      const iterator = await call(() => this.native.scanWithOptions(toBuffer(start), end == null ? undefined : toBuffer(end), options));
+      return new SlateDBIterator(iterator);
+    }
     const iterator = await call(() => this.native.scan(toBuffer(start), end == null ? undefined : toBuffer(end)));
     return new SlateDBIterator(iterator);
   }
 
-  async scanWithOptions(start: Binary, end?: Binary, options?: ScanOptions): Promise<SlateDBIterator> {
-    const iterator = await call(() => this.native.scanWithOptions(toBuffer(start), end == null ? undefined : toBuffer(end), options));
-    return new SlateDBIterator(iterator);
-  }
-
-  async scanPrefix(prefix: Binary): Promise<SlateDBIterator> {
+  async scanPrefix(prefix: Binary, options?: ScanOptions): Promise<SlateDBIterator> {
+    if (options) {
+      const iterator = await call(() => this.native.scanPrefixWithOptions(toBuffer(prefix), options));
+      return new SlateDBIterator(iterator);
+    }
     const iterator = await call(() => this.native.scanPrefix(toBuffer(prefix)));
-    return new SlateDBIterator(iterator);
-  }
-
-  async scanPrefixWithOptions(prefix: Binary, options?: ScanOptions): Promise<SlateDBIterator> {
-    const iterator = await call(() => this.native.scanPrefixWithOptions(toBuffer(prefix), options));
     return new SlateDBIterator(iterator);
   }
 
@@ -792,12 +776,12 @@ export class SlateDB {
     return new SlateDBTransaction(txn);
   }
 
-  async flush(): Promise<void> {
-    await call(() => this.native.flush());
-  }
-
-  async flushWithOptions(flushType?: "wal" | "memtable"): Promise<void> {
-    await call(() => this.native.flushWithOptions(flushType));
+  async flush(flushType?: "wal" | "memtable"): Promise<void> {
+    if (flushType) {
+      await call(() => this.native.flushWithOptions(flushType));
+    } else {
+      await call(() => this.native.flush());
+    }
   }
 
   async metrics(): Promise<Record<string, number>> {
