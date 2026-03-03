@@ -1,6 +1,6 @@
 {
   "name": "slatedb-node",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Node.js bindings for SlateDB via napi-rs",
   "homepage": "https://github.com/gadget-inc/slatedb-node",
   "bugs": {
